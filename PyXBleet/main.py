@@ -1,28 +1,26 @@
 import asyncio
 import bleak
 
+async def print_device_info(device):
+    print(f"Device name: {device.name}, Address: {device.address}")
+    manufacturer_data = device.metadata.get("manufacturer_data", {})
+    if manufacturer_data:
+        for manufacturer_code, data in manufacturer_data.items():
+            hex_code = format(manufacturer_code, '02X')
+            hex_data = ''.join(format(byte, '02X') for byte in data)
+            print(f"Manufacturer 0x{hex_code}\nData 0x{hex_data}")
+    else:
+        print("No manufacturer data available")
+    print()
+
 async def scan_for_ble_devices():
-    try:
-        devices = await bleak.discover()
-        if devices:
-            print("Discovered BLE device(s):")
-            for device in devices:
-                print(f"Device name: {device.name}, Address: {device.address}")
-                if device.metadata:
-                    manufacturer_data = device.metadata.get("manufacturer_data")
-                    if manufacturer_data:
-                        # Extract and print manufacturer codes
-                        for manufacturer_code, data in manufacturer_data.items():
-                            hex_manufacturer_code = ''.join(f'{byte:02X}' for byte in manufacturer_data)
-                            hex_data = ''.join(f'{byte:02X}' for byte in data)
-                            print(f"Manufacturer 0x{hex_manufacturer_code}\nData 0x{hex_data}")
-                    else:
-                        print("No manufacturer data set")
-                print()
-        else:
-            print("No BLE devices found nearby.")
-    except Exception as e:
-        print(f"Error: {e}")
+    devices = await bleak.discover()
+    if devices:
+        print("Discovered BLE device(s):")
+        for device in devices:
+            await print_device_info(device)
+    else:
+        print("No BLE devices found nearby.")
 
 if __name__ == "__main__":
     loop = asyncio.get_event_loop()
