@@ -1,0 +1,1 @@
+A utility for scanning BLE manufacturer data, using Bleak. Run pipenv install then pipenv run python PyXBleet/main.py
